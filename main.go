@@ -65,7 +65,8 @@ func main() {
 	rpc.Register(VPC25Cube);
 	//把服务处理绑定到http协议上
 	rpc.HandleHTTP();
-	err := http.ListenAndServe("127.0.0.1:8082", nil);
+	err := http.ListenAndServe("0.0.0.0:8082", nil);
+	fmt.Println("start...")
 	if err != nil {
 		log.Fatal(err);
 	}
