@@ -43,20 +43,20 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 	fmt.Println("login.U.Clients",login.U.Clients)
 	var mux sync.WaitGroup
 	for i,ip1  := range p.Ips{
-		for _ ,ip2:= range p.Ips[i:]{
+		for _ ,ip2:= range p.Ips[i+1:]{
 			fmt.Println("ip2,ip1...",ip2,ip1,p.Ips[i:])
 			mux.Add(1)
-			go func(ip3,ip4 string){
+			go func(ip3,ip4 string,cli map[string]*login.SSHClient){
 				defer mux.Done()
 				raw := fmt.Sprintf("ping %s -I %s",ip3,ip4)
-				std, err:= login.U.Clients[ip4].SshSessionRun(raw)
+				std, err:= cli[ip4].SshSessionRun(raw)
 				fmt.Println(std,err)
 				if err!=nil{
 					var a int
 					a = -1
 					ret = &a
 				}
-			}(ip2,ip1)
+			}(ip2,ip1,login.U.Clients)
 
 		}
 
