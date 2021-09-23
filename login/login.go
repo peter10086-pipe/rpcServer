@@ -15,6 +15,19 @@ const (
 	Password = "gauge_auto_test"
 )
 
+var (
+
+	 globalClient map[string]*ssh.Session
+)
+
+
+func init(){
+
+	globalClient = make(map[string]*ssh.Session)
+
+}
+
+
 
 
 func SshHost( host , rawCmd string) (stdout string, err error) {
@@ -61,21 +74,30 @@ func NewSSHClient(ip string, username string, password string, port ...int) *SSH
 func (c *SSHClient) Run(shell string) (string, error) {
 	t1 := time.Now()
 	//var mtx sync.RWMutex
+	var session *ssh.Session
+	if _,ok := globalClient[c.IP];ok{
+
+		session = globalClient[c.IP]
+
+	}else{
 	log.Println("execute cmd: %s,%s,%v", shell, c.Username+c.IP+strconv.Itoa(c.Port), t1)
 	if c.Client == nil {
 		if err := Retry(20, 5*time.Second, c.connect); err != nil {
 			t2 := time.Now()
-			log.Println("The connection failure took  %v", t2.Sub(t1))
+			log.Println("The connection failure took", t2.Sub(t1))
 			return "", err
 		}
 	}
 	t2 := time.Now()
 	log.Println("The successful connection took  %v", t2.Sub(t1))
-	session, err := c.Client.NewSession()
-	if err != nil {
-		return "", err
+	var err1 error
+	session, err1 = c.Client.NewSession()
+	if err1 != nil {
+		return "", err1
 	}
-	defer session.Close()
+	globalClient[c.IP] = session
+	}
+	//defer session.Close()
 	//mtx.Lock()
 	//gauge.GetScenarioStore()[c.Username+c.IP+strconv.Itoa(c.Port)] = "true"
 	//ConcurrentMap.Set(c.Username+c.IP+strconv.Itoa(c.Port), "true")

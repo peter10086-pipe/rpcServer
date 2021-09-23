@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/rpc"
 	"rpcServer/login"
+	"strings"
 	"sync"
-	uuid "github.com/satori/go.uuid"
 )
 
 //go对RPC的支持，支持三个级别：TCP、HTTP、JSONRPC
@@ -15,7 +15,6 @@ import (
 
 //注意字段必须是导出
 type Params struct {
-	Width, Height int;
 	SrcIp string;
 	Ips  []string
 }
@@ -29,27 +28,34 @@ type VPC25Cube struct{}
 //第一个参数是接收参数
 //第二个参数是返回给客户端参数，必须是指针类型
 //函数还要有一个返回值error
+
+
 func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
-	*ret = p.Width * p.Height
+
 	fmt.Println(p)
+
 	var mux sync.WaitGroup
 	if true{
 		for _, v := range p.Ips{
 			mux.Add(1)
 			go func(d string,ip Params){
 				defer mux.Done()
-				rawCmd := fmt.Sprintf("ping %s -c 1 -I %s",d,ip.SrcIp)
+				rawCmd := fmt.Sprintf("ulimit -n 102400;ping %s -c 1 -I %s",d,ip.SrcIp)
 				fmt.Println("====================start",ip.SrcIp)
 				fmt.Println(rawCmd)
 				fmt.Println("====================end")
 				std,_:= login.SshHost(ip.SrcIp,rawCmd)
+				if strings.Contains(std,"100%"){
+					var a int
+					a = -1
+					ret = &a
+				}
 				fmt.Println(std)
 			}(v,p)
 
 		}
 	}
 	mux.Wait()
-	fmt.Println("***********************hell0*********************",uuid.NewV4())
 	return nil;
 }
 
