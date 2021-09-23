@@ -40,11 +40,11 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 			mux.Add(1)
 			go func(d string,ip Params){
 				defer mux.Done()
-				rawCmd := fmt.Sprintf("ping %s -c 1 -I %s",d,ip.SrcIp)
+				rawCmd := fmt.Sprintf("date;ping %s -c 1 -I %s",d,ip.SrcIp)
 				fmt.Println("====================start",ip.SrcIp)
 				fmt.Println(rawCmd)
-				fmt.Println("====================end")
 				std,_:= login.SshHost(ip.SrcIp,rawCmd)
+				fmt.Println("====================end")
 				if strings.Contains(std,"100%"){
 					var a int
 					a = -1
