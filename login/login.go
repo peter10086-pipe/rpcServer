@@ -82,7 +82,7 @@ func (c *SSHClient) Run(shell string) (string, error) {
 	}else{
 	log.Println("execute cmd: %s,%s,%v", shell, c.Username+c.IP+strconv.Itoa(c.Port), t1)
 	if c.Client == nil {
-		if err := Retry(20, 5*time.Second, c.connect); err != nil {
+		if err := Retry(2, 1*time.Second, c.connect); err != nil {
 			t2 := time.Now()
 			log.Println("The connection failure took", t2.Sub(t1))
 			return "", err
@@ -96,6 +96,7 @@ func (c *SSHClient) Run(shell string) (string, error) {
 		return "", err1
 	}
 	globalClient[c.IP] = session
+	fmt.Println("globalClient",globalClient[c.IP])
 	}
 	//defer session.Close()
 	//mtx.Lock()
