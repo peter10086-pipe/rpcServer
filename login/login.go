@@ -74,12 +74,12 @@ func NewSSHClient(ip string, username string, password string, port ...int) *SSH
 func (c *SSHClient) Run(shell string) (string, error) {
 	t1 := time.Now()
 	//var mtx sync.RWMutex
-	var session *ssh.Session
-	if _,ok := globalClient[c.IP];ok{
-		fmt.Println("session has exist ",c.IP)
-		session = globalClient[c.IP]
-
-	}else{
+	//var session *ssh.Session
+	//if _,ok := globalClient[c.IP];ok{
+	//	fmt.Println("session has exist ",c.IP)
+		//session = globalClient[c.IP]
+	//
+	//}else{
 	log.Println("execute cmd ", shell, c.Username+c.IP+strconv.Itoa(c.Port), t1)
 	if c.Client == nil {
 		if err := Retry(2, 1*time.Second, c.connect); err != nil {
@@ -91,13 +91,13 @@ func (c *SSHClient) Run(shell string) (string, error) {
 	t2 := time.Now()
 	log.Println("The successful connection took  %v", t2.Sub(t1))
 	var err1 error
-	session, err1 = c.Client.NewSession()
+	session, err1 := c.Client.NewSession()
 	if err1 != nil {
 		return "", err1
 	}
-	globalClient[c.IP] = session
+	//globalClient[c.IP] = session
 	fmt.Println("globalClient",globalClient[c.IP])
-	}
+	//}
 	//defer session.Close()
 	//mtx.Lock()
 	//gauge.GetScenarioStore()[c.Username+c.IP+strconv.Itoa(c.Port)] = "true"
