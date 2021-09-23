@@ -76,7 +76,7 @@ func (c *SSHClient) Run(shell string) (string, error) {
 	//var mtx sync.RWMutex
 	var session *ssh.Session
 	if _,ok := globalClient[c.IP];ok{
-
+		fmt.Println("session has exist ",c.IP)
 		session = globalClient[c.IP]
 
 	}else{

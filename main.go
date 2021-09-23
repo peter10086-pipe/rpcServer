@@ -40,7 +40,7 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 			mux.Add(1)
 			go func(d string,ip Params){
 				defer mux.Done()
-				rawCmd := fmt.Sprintf("ulimit -n 102400;ping %s -c 1 -I %s",d,ip.SrcIp)
+				rawCmd := fmt.Sprintf("ping %s -c 1 -I %s",d,ip.SrcIp)
 				fmt.Println("====================start",ip.SrcIp)
 				fmt.Println(rawCmd)
 				fmt.Println("====================end")
