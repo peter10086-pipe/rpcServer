@@ -111,11 +111,11 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 			defer wg.Done()
 			//u.findHostIPByType(host.Name,"")
 				u.Infof("current login host:%v", hostNames)
-					cli := NewSSHClient(ip, UhostUsername, Password)
+					cli := NewSSHClient(PodIp, UhostUsername, Password)
 					time.Sleep(1 * time.Second)
 					if err := cli.SshConnect(); err != nil {
 						//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
-						u.Errorf("%s(%s) login fail,other success login is %v", ip)
+						u.Errorf("%s(%s) login fail,other success login is %v", PodIp)
 						errChan <- fmt.Errorf("internet err:%v,%s(%s) login fail, other success login is %v", err,successLoginHosts)
 					} else {
 						cli.SshSessionRun(`echo "MaxSessions 1000000" >> /etc/ssh/sshd_config`)
@@ -128,13 +128,13 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 						cli.Client.Close()
 						cli1 := NewSSHClient(ip, UhostUsername, Password)
 						if err := cli1.SshConnect(); err != nil {
-							u.Errorf("%s(%s) login again fail,other success login is %v",ip)
+							u.Errorf("%s(%s) login again fail,other success login is %v",PodIp)
 							//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
-							errChan <- fmt.Errorf("login again internet err:%v,%s login fail, other success login is %v", err, ip, successLoginHosts)
+							errChan <- fmt.Errorf("login again internet err:%v,%s login fail, other success login is %v", err, PodIp, successLoginHosts)
 						} else {
 							mt.Lock()
-							u.Clients[ip] = cli1
-							successLoginHosts = append(successLoginHosts, sshInfoSuccess{ip:ip})
+							u.Clients[PodIp] = cli1
+							successLoginHosts = append(successLoginHosts, sshInfoSuccess{ip:PodIp})
 							mt.Unlock()
 						}
 					}
