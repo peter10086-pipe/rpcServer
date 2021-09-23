@@ -110,7 +110,7 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 		go func( PodIp string) {
 			defer wg.Done()
 			//u.findHostIPByType(host.Name,"")
-				u.Infof("current login host:%v", hostNames)
+				u.Infof("current login host:%v", PodIp)
 					cli := NewSSHClient(PodIp, UhostUsername, Password)
 					time.Sleep(1 * time.Second)
 					if err := cli.SshConnect(); err != nil {
@@ -126,7 +126,7 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 
 						// cli.SshSessionRun(`echo 50000 > /proc/sys/net/ipv4/neigh/eth0/gc_stale_time`)
 						cli.Client.Close()
-						cli1 := NewSSHClient(ip, UhostUsername, Password)
+						cli1 := NewSSHClient(PodIp, UhostUsername, Password)
 						if err := cli1.SshConnect(); err != nil {
 							u.Errorf("%s(%s) login again fail,other success login is %v",PodIp)
 							//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
