@@ -80,7 +80,7 @@ func (c *SSHClient) Run(shell string) (string, error) {
 		session = globalClient[c.IP]
 
 	}else{
-	log.Println("execute cmd: %s,%s,%v", shell, c.Username+c.IP+strconv.Itoa(c.Port), t1)
+	log.Println("execute cmd ", shell, c.Username+c.IP+strconv.Itoa(c.Port), t1)
 	if c.Client == nil {
 		if err := Retry(2, 1*time.Second, c.connect); err != nil {
 			t2 := time.Now()
