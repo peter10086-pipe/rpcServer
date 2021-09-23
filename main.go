@@ -42,7 +42,7 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 
 	var mux sync.WaitGroup
 	for i,ip1  := range p.Ips{
-		for _ ,ip2:= range p.Ips[i+1:]{
+		for _ ,ip2:= range p.Ips[i:]{
 			mux.Add(1)
 			go func(ip3,ip4 string){
 				defer mux.Done()

@@ -257,7 +257,7 @@ func (c *SSHClient) SshConnect() error {
 	//defer c.client.Close()
 	t1 := time.Now()
 	if c.Client == nil {
-		if err := Retry(2, 1*time.Second, c.connect); err != nil {
+		if err := Retry(5, 2*time.Second, c.connect); err != nil {
 			t2 := time.Now()
 			log.Println("The connection failure took ", t2.Sub(t1))
 			return err
