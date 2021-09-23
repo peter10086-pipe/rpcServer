@@ -40,7 +40,7 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 
 		ulog.Errorf("login fail ")
 	}
-
+	fmt.Println(login.U.Clients)
 	var mux sync.WaitGroup
 	for i,ip1  := range p.Ips{
 		for _ ,ip2:= range p.Ips[i:]{

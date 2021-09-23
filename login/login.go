@@ -274,6 +274,7 @@ func (c *SSHClient) SshConnect() error {
 }
 
 func (c *SSHClient) SshSessionRun(shell string) (string, error) {
+	fmt.Println(c.IP)
 	session, err := c.Client.NewSession()
 	if err != nil {
 		return "", err
