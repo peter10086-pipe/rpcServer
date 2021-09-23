@@ -4,10 +4,73 @@ import (
 	"fmt"
 	"net"
 	"strconv"
-	"time"
-	"golang.org/x/crypto/ssh"
+
 	"log"
+
+	"github.com/sirupsen/logrus"
+	cu "github.com/ucloud/ucloud-sdk-go/services/cube"
+	"github.com/ucloud/ucloud-sdk-go/ucloud"
+	"github.com/ucloud/ucloud-sdk-go/ucloud/auth"
+	ulog "github.com/ucloud/ucloud-sdk-go/ucloud/log"
+	"golang.org/x/crypto/ssh"
+	"sync"
+	"time"
+
 )
+
+type (
+	VpcfeClient struct {
+		*ucloud.Client
+	}
+)
+
+var U *UCloudEnv
+
+func NewUCloudEnv() *UCloudEnv {
+	config := ucloud.NewConfig()
+	config.BaseUrl = "http://api.ucloud.cn"
+	config.Region = "cn-sh2"
+	config.Zone =  "cn-sh2-01"
+	config.ProjectId ="org-0x4kng"
+
+	if lvl, e := logrus.ParseLevel("debug"); e != nil {
+		panic(e)
+	} else {
+		config.LogLevel = ulog.Level(lvl)
+	}
+
+	credential := auth.NewCredential()
+	credential.PrivateKey = "EPToanhc560W5FzG1Zbq0QQK3h3kkf7hDOFyCv59SbCj68D9rOKp5sFzern9ULS5"
+	credential.PublicKey = "gik0jB0CNWWgIbHrIr6ig3kIxrc0IoqTvu/huqf9u0ZRxA/8FEFUnxq7zOia8m2g"
+
+
+	u := &UCloudEnv{
+		Logger:       ulog.New(), // ulog.New(),
+		cub:          cu.NewClient(&config,&credential),
+		vpcfego:      NewVPCClient(&config,&credential),
+		connects:     make(map[string]*ssh.Session),
+		Clients:   make(map[string]*SSHClient),
+	}
+	return u
+}
+
+func NewVPCClient(config *ucloud.Config, credential *auth.Credential) *VpcfeClient {
+	meta := ucloud.ClientMeta{Product: "VPC2.0"}
+	client := ucloud.NewClientWithMeta(config, credential, meta)
+	return &VpcfeClient{
+		client,
+	}
+}
+
+type  UCloudEnv struct {
+	ulog.Logger
+	cub            *cu.CubeClient
+	vpcfego         *VpcfeClient
+	connects         map[string]*ssh.Session
+	Clients          map[string]*SSHClient
+
+}
+
 
 const (
 
@@ -24,10 +87,86 @@ var (
 func init(){
 
 	globalClient = make(map[string]*ssh.Session)
-
+	U = NewUCloudEnv()
 }
 
+func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
+	var hostNames = make([]string, 0)
+	type sshInfoSuccess struct {
+		ip string
+	}
+	var successLoginHosts = make([]sshInfoSuccess, 0)
+	//var InitClient = make(map[string]*SSHClient)
+	var mt sync.Mutex
+	var wg sync.WaitGroup
+	var errChan = make(chan error)
 
+	//todo
+
+	//
+
+	for _, ip := range ips {
+		wg.Add(1)
+		go func( PodIp string) {
+			defer wg.Done()
+			//u.findHostIPByType(host.Name,"")
+				u.Infof("current login host:%v", hostNames)
+					cli := NewSSHClient(ip, UhostUsername, Password)
+					time.Sleep(1 * time.Second)
+					if err := cli.SshConnect(); err != nil {
+						//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
+						u.Errorf("%s(%s) login fail,other success login is %v", ip)
+						errChan <- fmt.Errorf("internet err:%v,%s(%s) login fail, other success login is %v", err,successLoginHosts)
+					} else {
+						cli.SshSessionRun(`echo "MaxSessions 1000000" >> /etc/ssh/sshd_config`)
+						cli.SshSessionRun(`echo "UseDNS no" >> /etc/ssh/sshd_config`)
+						cli.SshSessionRun(`systemctl restart sshd`)
+						//cli.SshSessionRun(`arp -n|awk '/^[1-9]/{print "arp -d " $1}'|sh -x`)
+						//cli.SshSessionRun(`ip a|grep  'inet .*/32' |sed  's/^\s*//'|sed 's/\s*$//'|awk '{print $2}' |xargs -I {} ip addr del {} dev eth0`)
+
+						// cli.SshSessionRun(`echo 50000 > /proc/sys/net/ipv4/neigh/eth0/gc_stale_time`)
+						cli.Client.Close()
+						cli1 := NewSSHClient(ip, UhostUsername, Password)
+						if err := cli1.SshConnect(); err != nil {
+							u.Errorf("%s(%s) login again fail,other success login is %v",ip)
+							//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
+							errChan <- fmt.Errorf("login again internet err:%v,%s login fail, other success login is %v", err, ip, successLoginHosts)
+						} else {
+							mt.Lock()
+							u.Clients[ip] = cli1
+							successLoginHosts = append(successLoginHosts, sshInfoSuccess{ip:ip})
+							mt.Unlock()
+						}
+					}
+		}(ip)
+	}
+	flg := false
+	var reason error
+	go func() {
+		for {
+			select {
+			case errInfo := <-errChan:
+				if errInfo != nil {
+					flg = true
+					reason = errInfo
+				}
+			default:
+
+			}
+		}
+	}()
+
+	wg.Wait()
+
+	if flg {
+		return fmt.Errorf("VerifyLoginSuccess error %s",flg)
+	}
+	u.Infof("hosts has login %v", ips)
+	if len(ips) != 0 {
+		u.Infof("子网%s主机%v已经确认能够全部登录", time.Now(),  hostNames)
+	}
+	return nil
+}
 
 
 func SshHost( host , rawCmd string) (stdout string, err error) {
@@ -82,7 +221,7 @@ func (c *SSHClient) Run(shell string) (string, error) {
 	//}else{
 	log.Println("execute cmd ", shell, c.Username+c.IP+strconv.Itoa(c.Port), t1)
 	if c.Client == nil {
-		if err := Retry(2, 1*time.Second, c.connect); err != nil {
+		if err := Retry(10, 2*time.Second, c.connect); err != nil {
 			t2 := time.Now()
 			log.Println("The connection failure took", t2.Sub(t1))
 			return "", err

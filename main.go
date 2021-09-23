@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	ulog "github.com/ucloud/ucloud-sdk-go/ucloud/log"
 	"log"
 	"net/http"
 	"net/rpc"
 	"rpcServer/login"
-	"strings"
 	"sync"
 )
 
@@ -33,30 +33,59 @@ type VPC25Cube struct{}
 func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 
 	fmt.Println(p)
+    err:= login.U.VerifyLoginSuccess(p.Ips)
+
+	if err != nil{
+
+		ulog.Errorf("login fail ")
+	}
 
 	var mux sync.WaitGroup
-	if true{
-		for _, v := range p.Ips{
+	for i,ip1  := range p.Ips{
+		for _ ,ip2:= range p.Ips[i+1:]{
 			mux.Add(1)
-			go func(d string,ip Params){
+			go func(ip3,ip4 string){
 				defer mux.Done()
-				rawCmd := fmt.Sprintf("date;ping %s -c 1 -I %s",d,ip.SrcIp)
-				fmt.Println("====================start",ip.SrcIp)
-				fmt.Println(rawCmd)
-				std,_:= login.SshHost(ip.SrcIp,rawCmd)
-				fmt.Println("====================end")
-				if strings.Contains(std,"100%"){
+				raw := fmt.Sprintf("ping %s -I %s",ip3,ip4)
+				std, err:= login.U.Clients[ip1].SshSessionRun(raw)
+				fmt.Println(std,err)
+				if err!=nil{
 					var a int
 					a = -1
 					ret = &a
 				}
-				fmt.Println(std)
-			}(v,p)
+			}(ip2,ip1)
 
 		}
+
 	}
 	mux.Wait()
-	return nil;
+
+	//var mux sync.WaitGroup
+	//if true{
+	//	for _, v := range p.Ips{
+	//		mux.Add(1)
+	//		go func(d string,ip Params){
+	//			defer mux.Done()
+	//			rawCmd := fmt.Sprintf("date;ping %s -c 1 -I %s",d,ip.SrcIp)
+	//			fmt.Println("====================start",ip.SrcIp)
+	//			fmt.Println(rawCmd)
+	//			std,_:= login.SshHost(ip.SrcIp,rawCmd)
+	//			fmt.Println("====================end")
+	//			if strings.Contains(std,"100%"){
+	//				var a int
+	//				a = -1
+	//				ret = &a
+	//			}
+	//			fmt.Println(std)
+	//		}(v,p)
+	//
+	//	}
+	//}
+
+	//return nil;
+
+	return nil
 }
 
 //func (r *VPC25Cube) Perimeter(p Params, ret *int) error {
