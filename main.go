@@ -33,6 +33,7 @@ type VPC25Cube struct{}
 func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 
 	fmt.Println(p)
+
     err:= login.U.VerifyLoginSuccess(p.Ips)
 
 	if err != nil{
@@ -43,6 +44,7 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 	var mux sync.WaitGroup
 	for i,ip1  := range p.Ips{
 		for _ ,ip2:= range p.Ips[i:]{
+			fmt.Println("ip2,ip1...",ip2,ip1,p.Ips[i:])
 			mux.Add(1)
 			go func(ip3,ip4 string){
 				defer mux.Done()
