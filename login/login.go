@@ -110,7 +110,6 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 			//u.findHostIPByType(host.Name,"")
 				u.Infof("current login host:%v", PodIp)
 					cli := NewSSHClient(PodIp, UhostUsername, Password)
-					time.Sleep(1 * time.Second)
 					if err := cli.SshConnect(); err != nil {
 						//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
 						u.Errorf("%s(%s) login fail,other success login is %v", PodIp)
@@ -131,7 +130,7 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 						//	errChan <- fmt.Errorf("login again internet err:%v,%s login fail, other success login is %v", err, PodIp, successLoginHosts)
 						//} else {
 						//	mt.Lock()
-						//	u.Clients[PodIp] = cli
+							u.Clients[PodIp] = cli
 							a := ""
 							log := time.Now().Unix()
 						    for _,v:= range ips{
