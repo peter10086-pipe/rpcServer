@@ -135,9 +135,9 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 							a := ""
 							log := time.Now().Unix()
 						    for _,v:= range ips{
-								a = a + fmt.Sprintf("ping %s -c3 -I %s >> %v&;",v,PodIp,log)
+								a = a + fmt.Sprintf(" ping %s -c3 -I %s >> %v &",v,PodIp,log)
 							}
-						    a = a + fmt.Sprintf("sleep 5;cat %v;",log)
+						    a = a + fmt.Sprintf("sleep 5; cat %v;",log)
 							//fmt.Sprintf("ping ")
 							//cli.SshSessionRun(a)
 						    std, err:=cli.SshSessionRun(a)
