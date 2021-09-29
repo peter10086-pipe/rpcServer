@@ -8,6 +8,7 @@ import (
 	"net/rpc"
 	"rpcServer/login"
 	"sync"
+	"time"
 )
 
 //go对RPC的支持，支持三个级别：TCP、HTTP、JSONRPC
@@ -45,6 +46,7 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 	for i,ip1  := range p.Ips{
 		for _ ,ip2:= range p.Ips[i+1:]{
 			fmt.Println("ip2,ip1...",ip2,ip1,p.Ips[i:])
+			time.Sleep(time.Millisecond*5)
 			mux.Add(1)
 			go func(ip3,ip4 string,cli map[string]*login.SSHClient){
 				defer mux.Done()
