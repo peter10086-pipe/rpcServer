@@ -118,9 +118,9 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 						u.Errorf("%s(%s) login fail,other success login is %v", PodIp)
 						errChan <- fmt.Errorf("internet err:%v,%s(%s) login fail, other success login is %v", err,successLoginHosts)
 					} else {
-						cli.SshSessionRun(`echo "MaxSessions 1000000" >> /etc/ssh/sshd_config`)
-						cli.SshSessionRun(`echo "UseDNS no" >> /etc/ssh/sshd_config`)
-						cli.SshSessionRun(`systemctl restart sshd`)
+						//cli.SshSessionRun(`echo "MaxSessions 1000000" >> /etc/ssh/sshd_config`)
+						//cli.SshSessionRun(`echo "UseDNS no" >> /etc/ssh/sshd_config`)
+						//cli.SshSessionRun(`systemctl restart sshd`)
 						//cli.SshSessionRun(`arp -n|awk '/^[1-9]/{print "arp -d " $1}'|sh -x`)
 						//cli.SshSessionRun(`ip a|grep  'inet .*/32' |sed  's/^\s*//'|sed 's/\s*$//'|awk '{print $2}' |xargs -I {} ip addr del {} dev eth0`)
 
@@ -257,7 +257,7 @@ func (c *SSHClient) SshConnect() error {
 	//defer c.client.Close()
 	t1 := time.Now()
 	if c.Client == nil {
-		if err := Retry(5, 2*time.Second, c.connect); err != nil {
+		if err := Retry(10, 3*time.Second, c.connect); err != nil {
 			t2 := time.Now()
 			log.Println("The connection failure took ", t2.Sub(t1))
 			return err
