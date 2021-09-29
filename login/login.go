@@ -125,18 +125,18 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 						//cli.SshSessionRun(`ip a|grep  'inet .*/32' |sed  's/^\s*//'|sed 's/\s*$//'|awk '{print $2}' |xargs -I {} ip addr del {} dev eth0`)
 
 						// cli.SshSessionRun(`echo 50000 > /proc/sys/net/ipv4/neigh/eth0/gc_stale_time`)
-						cli.Client.Close()
-						cli1 := NewSSHClient(PodIp, UhostUsername, Password)
-						if err := cli1.SshConnect(); err != nil {
-							u.Errorf("%s(%s) login again fail,other success login is %v",PodIp)
-							//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
-							errChan <- fmt.Errorf("login again internet err:%v,%s login fail, other success login is %v", err, PodIp, successLoginHosts)
-						} else {
+						//cli.Client.Close()
+						//cli1 := NewSSHClient(PodIp, UhostUsername, Password)
+						//if err := cli1.SshConnect(); err != nil {
+						//	u.Errorf("%s(%s) login again fail,other success login is %v",PodIp)
+						//	//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
+						//	errChan <- fmt.Errorf("login again internet err:%v,%s login fail, other success login is %v", err, PodIp, successLoginHosts)
+						//} else {
 							mt.Lock()
-							u.Clients[PodIp] = cli1
+							u.Clients[PodIp] = cli
 							successLoginHosts = append(successLoginHosts, sshInfoSuccess{ip:PodIp})
 							mt.Unlock()
-						}
+						//}
 					}
 		}(ip)
 	}

@@ -48,6 +48,9 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 			mux.Add(1)
 			go func(ip3,ip4 string,cli map[string]*login.SSHClient){
 				defer mux.Done()
+				if cli == nil{
+					return
+				}
 				raw := fmt.Sprintf("ping -c3 %s -I %s",ip3,ip4)
 				std, err:= cli[ip4].SshSessionRun(raw)
 				fmt.Println(std,err)
