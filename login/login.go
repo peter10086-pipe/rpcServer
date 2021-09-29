@@ -2,10 +2,9 @@ package login
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"strconv"
-
-	"log"
 
 	"github.com/sirupsen/logrus"
 	cu "github.com/ucloud/ucloud-sdk-go/services/cube"
@@ -15,7 +14,6 @@ import (
 	"golang.org/x/crypto/ssh"
 	"sync"
 	"time"
-
 )
 
 type (
@@ -97,7 +95,7 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 	}
 	var successLoginHosts = make([]sshInfoSuccess, 0)
 	//var InitClient = make(map[string]*SSHClient)
-	var mt sync.Mutex
+	//var mt sync.Mutex
 	var wg sync.WaitGroup
 	var errChan = make(chan error)
 
@@ -132,11 +130,20 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 						//	//FailF(err, "%s(%s) login fail,other success login is %v", host.Name, host.UHostId, successLoginHosts)
 						//	errChan <- fmt.Errorf("login again internet err:%v,%s login fail, other success login is %v", err, PodIp, successLoginHosts)
 						//} else {
-							mt.Lock()
-							u.Clients[PodIp] = cli
-							cli.SshSessionRun("ping -h")
+						//	mt.Lock()
+						//	u.Clients[PodIp] = cli
+							a := ""
+							log := time.Now().Unix()
+						    for _,v:= range ips{
+								a = a + fmt.Sprintf("ping %s -c3 -I %s >> %v&;",v,PodIp,log)
+							}
+						    a = a + fmt.Sprintf("sleep 5;cat %v;",log)
+							//fmt.Sprintf("ping ")
+							//cli.SshSessionRun(a)
+						    std, err:=cli.SshSessionRun(a)
+						    fmt.Println(std,err)
 							successLoginHosts = append(successLoginHosts, sshInfoSuccess{ip:PodIp})
-							mt.Unlock()
+							//mt.Unlock()
 						//}
 					}
 		}(ip)
