@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"net/rpc"
 	"rpcServer/login"
-	"sync"
-	"time"
 )
 
 //go对RPC的支持，支持三个级别：TCP、HTTP、JSONRPC
@@ -41,32 +39,32 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 
 		ulog.Errorf("login fail ")
 	}
-	fmt.Println("login.U.Clients",login.U.Clients)
-	var mux sync.WaitGroup
-	for i,ip1  := range p.Ips{
-		for _ ,ip2:= range p.Ips[i+1:]{
-			fmt.Println("ip2,ip1...",ip2,ip1,p.Ips[i:])
-			time.Sleep(time.Millisecond*5)
-			mux.Add(1)
-			go func(ip3,ip4 string,cli map[string]*login.SSHClient){
-				defer mux.Done()
-				if cli == nil{
-					return
-				}
-				raw := fmt.Sprintf("ping -c3 %s -I %s",ip3,ip4)
-				std, err:= cli[ip4].SshSessionRun(raw)
-				fmt.Println(std,err)
-				if err!=nil{
-					var a int
-					a = -1
-					ret = &a
-				}
-			}(ip2,ip1,login.U.Clients)
-
-		}
-
-	}
-	mux.Wait()
+	//fmt.Println("login.U.Clients",login.U.Clients)
+	//var mux sync.WaitGroup
+	//for i,ip1  := range p.Ips{
+	//	for _ ,ip2:= range p.Ips[i+1:]{
+	//		fmt.Println("ip2,ip1...",ip2,ip1,p.Ips[i:])
+	//		time.Sleep(time.Millisecond*5)
+	//		mux.Add(1)
+	//		go func(ip3,ip4 string,cli map[string]*login.SSHClient){
+	//			defer mux.Done()
+	//			if cli == nil{
+	//				return
+	//			}
+	//			raw := fmt.Sprintf("ping -c3 %s -I %s",ip3,ip4)
+	//			std, err:= cli[ip4].SshSessionRun(raw)
+	//			fmt.Println(std,err)
+	//			if err!=nil{
+	//				var a int
+	//				a = -1
+	//				ret = &a
+	//			}
+	//		}(ip2,ip1,login.U.Clients)
+	//
+	//	}
+	//
+	//}
+	//mux.Wait()
 
 	//var mux sync.WaitGroup
 	//if true{

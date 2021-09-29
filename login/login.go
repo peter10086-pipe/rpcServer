@@ -134,6 +134,7 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 						//} else {
 							mt.Lock()
 							u.Clients[PodIp] = cli
+							cli.SshSessionRun("ping -h")
 							successLoginHosts = append(successLoginHosts, sshInfoSuccess{ip:PodIp})
 							mt.Unlock()
 						//}
