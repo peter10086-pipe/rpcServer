@@ -130,14 +130,25 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	}
 	ulog.Infof("start p.SrcIp %s %s yum -y install iperf3",p.SrcIp,std)
 
-//;nohup iperf3 -i2 -s > 123.log&
+
+	//;nohup iperf3 -i2 -s > 123.log&
 	std1, err1 := login.U.SshHost(p.DstIp,"pkill iperf3;yum -y install iperf3")
 	if err1 !=nil{
 		return err1
 	}
-
-	ulog.Infof("start p.DstIp %s %s yum -y install iperf3",p.DstIp,std1)
 	log := time.Now().UnixNano()
+	rawd := fmt.Sprintf("(nohup iperf3 -i2 %s -t10 > %v 2>&1 &) | timeout 1 tail -f %v",p.DstIp,log,log)
+	//;nohup iperf3 -i2 -s > 123.log&
+	ulog.Infof(rawd)
+
+	std, err = login.U.SshHost(p.DstIp,rawd)
+	if err !=nil{
+		fmt.Println("ssh error",err)
+		return err
+	}
+
+	ulog.Infof("iperf3 iperiperf3 -i2 ",p.DstIp,std1)
+
 	//(nohup iperf3 -i2 -c 192.168.0.115 -t20 > 1632989479555073807 2>&1 &) | timeout 10 tail -f 1632989479555073807
 	raw := fmt.Sprintf("(nohup iperf3 -i2 -c %s -t20 > %v 2>&1 &) | timeout 10 tail -f %v",p.DstIp,log,log)
 	fmt.Println("rawrawrawrawrawrawrawrawraw",raw)
