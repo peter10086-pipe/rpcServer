@@ -123,7 +123,7 @@ func (r *VPC25Cube) ClientIperf(p Params, ret *int) error {
 
 func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	log := time.Now().UnixNano()
-	raw1 := fmt.Sprintf("nohup iperf3 -i2 -s > %v &",log)
+	raw1 := fmt.Sprintf("(nohup iperf3 -i2 -s > %s.log 2>&1 & ) || true",log)
 	fmt.Println(raw1)
 	std1, err := login.U.SshHost(p.DstIp,raw1)
 	if err !=nil{
