@@ -140,7 +140,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 
 	time.Sleep(time.Second*3)
 
-	raw := fmt.Sprintf("echo `date` > %v.log; (nohup iperf3 -i2 -c %s -t10 > %v.log 2>&1 &)||true ; sleep 20; cat %v.log",log,p.DstIp,log,log,)
+	raw := fmt.Sprintf("echo `date` > %v.log; (nohup iperf3 -i2 -c %s -b500M -t10 -u > %v.log 2>&1 &)||true ; sleep 20; cat %v.log",log,p.DstIp,log,log,)
 	fmt.Println(p)
 	std, err := login.U.SshHost(p.SrcIp,raw)
 	if err !=nil{
