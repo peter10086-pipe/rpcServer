@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/rpc"
 	"rpcServer/login"
+	"sync"
 	"time"
 )
 
@@ -123,15 +124,22 @@ func (r *VPC25Cube) ClientIperf(p Params, ret *int) error {
 
 func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	log := time.Now().UnixNano()
-	raw1 := fmt.Sprintf("(nohup iperf3 -i2 -s > %v.log 2>&1 & ) || true",log)
-	fmt.Println(raw1)
-	std1, err := login.U.SshHost(p.DstIp,raw1)
-	if err !=nil{
-		fmt.Println("sshser error",err)
-		return err
-	}
-	ulog.Infof("start p.SrcIp %s %s yum -y install iperf3",p.SrcIp,std1)
+	var sg sync.WaitGroup
+///	var sk sync.WaitGroup
+	sg.Add(1)
+	go func(){
+		defer sg.Done()
+		raw1 := fmt.Sprintf("pkill iperf3;(nohup iperf3 -i2 -s > %v.log 2>&1 & ) || true ; sleep 20; cat %v.log",log,log)
+		fmt.Println(raw1)
+		std1, err := login.U.SshHost(p.DstIp,raw1)
+		if err !=nil{
+			fmt.Println("server error",err)
+			return
+		}
+		ulog.Infof("start server p.DstIp %s %s",p.DstIp,std1,err)
+	}()
 
+	time.Sleep(time.Second*3)
 
 	raw := fmt.Sprintf("echo `date` > %v.log; (nohup iperf3 -i2 -c %s -t10 > %v.log 2>&1 &)||true ; sleep 20; cat %v.log",log,p.DstIp,log,log,)
 	fmt.Println(p)
@@ -140,7 +148,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 		fmt.Println("ssh error",err)
 		return err
 	}
-	ulog.Infof("start p.SrcIp %s %s yum -y install iperf3",p.SrcIp,std)
+	ulog.Infof("Client Send========",p.SrcIp,std)
 
 	//
 	////;nohup iperf3 -i2 -s > 123.log&
@@ -203,7 +211,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	//	ulog.Infof(std1)
 	//}(p)
 	//
-	//sg.Wait()
+	sg.Wait()
 	//sk.Wait()
 	fmt.Println("endendendendendendendendendendendend")
 
