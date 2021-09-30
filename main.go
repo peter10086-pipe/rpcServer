@@ -144,9 +144,9 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	sg.Add(1)
 	go func(pl Params){
 		defer sg.Done()
-		log := time.Now().UnixNano()
-		raw := fmt.Sprintf("",log,log)//ssssssssereresresrerere
-		std1, err := login.U.SshHost(pl.DstIp,raw)
+		//log := time.Now().UnixNano()
+		//raw := fmt.Sprintf("",log,log)//ssssssssereresresrerere
+		std1, err := login.U.SshHost(pl.DstIp,"ping")
 		if err !=nil{
 			fmt.Println("ssssssssereresresrerere",err)
 			return
@@ -159,8 +159,8 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	go func(pl Params){
 		defer sk.Done()
 	//	log := time.Now().UnixNano()
-		raw := fmt.Sprintf("")//
-		std1, err := login.U.SshHost(pl.SrcIp,raw)
+	//	raw := fmt.Sprintf("")//
+		std1, err := login.U.SshHost(pl.SrcIp,"ping")
 		if err !=nil{
 			fmt.Println("errerrerrerrerrerrerr",err)
 
