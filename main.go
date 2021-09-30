@@ -133,7 +133,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	ulog.Infof("start p.SrcIp %s %s yum -y install iperf3",p.SrcIp,std1)
 
 
-	raw := fmt.Sprintf("(nohup iperf3 -i2 -c %s -t20 > %v.log 2>&1 &) ||true ; timeout 10 tail -f %v",p.DstIp,log,log)
+	raw := fmt.Sprintf("echo `date` > %v.log; (nohup iperf3 -i2 -c %s -t10 > %v.log 2>&1 &)||true ; sleep 20; cat %v.log",p.DstIp,log,log,log)
 	fmt.Println(p)
 	std, err := login.U.SshHost(p.SrcIp,raw)
 	if err !=nil{
