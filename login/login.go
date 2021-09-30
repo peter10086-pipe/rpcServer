@@ -177,7 +177,9 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 }
 
 
-func SshHost( host , rawCmd string) (stdout string, err error) {
+
+
+func (u *UCloudEnv)  SshHost( host , rawCmd string) (stdout string, err error) {
 	Commcli := NewSSHClient(host, UhostUsername, Password)
 	stdout, err = Commcli.Run(rawCmd)
 	if err != nil {

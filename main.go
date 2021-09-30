@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/rpc"
 	"rpcServer/login"
+	"time"
 )
 
 //go对RPC的支持，支持三个级别：TCP、HTTP、JSONRPC
@@ -15,6 +16,7 @@ import (
 //注意字段必须是导出
 type Params struct {
 	SrcIp string;
+	DstIp string;
 	Ips  []string
 }
 
@@ -98,6 +100,48 @@ func (r *VPC25Cube) FullMeshPing(p Params, ret *int) error {
 //
 //	return nil;
 //}
+func (r *VPC25Cube) ClientIperf(p Params, ret *int) error {
+
+		fmt.Println(p)
+		std, err := login.U.SshHost(p.SrcIp,"yum -y install iperf3")
+		if err !=nil{
+		return err
+	}
+
+		ulog.Infof("start yum -y install iperf3",std)
+
+		log := time.Now().UnixNano()
+		raw := fmt.Sprintf("nohup iperf3 -i2  -c %s -t20 > %v & sleep 20 ; cat %v",p.DstIp,log,log)
+		std1, err := login.U.SshHost(p.SrcIp,raw)
+		if err !=nil{
+		return err
+		}
+		ulog.Infof(std1)
+		return nil
+
+}
+
+func (r *VPC25Cube) ServerIperf(p Params, ret *int) error {
+
+	fmt.Println(p)
+	std, err := login.U.SshHost(p.SrcIp,"yum -y install iperf3")
+	if err !=nil{
+		return err
+	}
+
+	ulog.Infof("start yum -y install iperf3",std)
+
+	log := time.Now().UnixNano()
+	raw := fmt.Sprintf("nohup iperf3 -i2 -s > %v & sleep 120 ; cat %v",log,log)
+	std1, err := login.U.SshHost(p.SrcIp,raw)
+	if err !=nil{
+		return err
+	}
+	ulog.Infof(std1)
+	return nil
+}
+
+
 
 func main() {
 	VPC25Cube := new(VPC25Cube);
