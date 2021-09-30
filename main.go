@@ -125,14 +125,14 @@ func (r *VPC25Cube) ClientIperf(p Params, ret *int) error {
 func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 
 	fmt.Println(p)
-	std, err := login.U.SshHost(p.SrcIp,"yum -y install iperf3")
+	std, err := login.U.SshHost(p.SrcIp,"pkill iperf3;yum -y install iperf3")
 	if err !=nil{
 		return err
 	}
 	ulog.Infof("start p.DstIp %s %s yum -y install iperf3",p.SrcIp,std)
 
 
-	std1, err1 := login.U.SshHost(p.DstIp,"yum -y install iperf3")
+	std1, err1 := login.U.SshHost(p.DstIp,"pkill iperf3;yum -y install iperf3")
 	if err1 !=nil{
 		return err1
 	}
