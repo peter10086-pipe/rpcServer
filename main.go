@@ -129,7 +129,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	if err !=nil{
 		return err
 	}
-	ulog.Infof("start p.DstIp %s %s yum -y install iperf3",p.SrcIp,std)
+	ulog.Infof("start p.SrcIp %s %s yum -y install iperf3",p.SrcIp,std)
 
 
 	std1, err1 := login.U.SshHost(p.DstIp,"pkill iperf3;yum -y install iperf3")
