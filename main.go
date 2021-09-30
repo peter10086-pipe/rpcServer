@@ -158,7 +158,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	go func(){
 		defer sk.Done()
 		log := time.Now().UnixNano()
-		raw := fmt.Sprintf("nohup iperf3 -i2 -c %s -t20 > %v 2>&1 > %v ",p.DstIp,log,log)
+		raw := fmt.Sprintf("nohup iperf3 -i2 -c %s -t20 > %v 2>&1 > %v and tail -f %v ",p.DstIp,log,log,log)
 		std1, err := login.U.SshHost(p.SrcIp,raw)
 		if err !=nil{
 			fmt.Println("errerrerrerrerrerrerr",err)
