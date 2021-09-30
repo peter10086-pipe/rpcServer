@@ -137,7 +137,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 		return err1
 	}
 	log := time.Now().UnixNano()
-	rawd := fmt.Sprintf("(nohup iperf3 -i2 %s -t10 > %v 2>&1 &) | timeout 1 tail -f %v",p.DstIp,log,log)
+	rawd := fmt.Sprintf("iperf3 -i2 %s -t10 > %v | timeout 1 tail -f %v",p.DstIp,log,log)
 	//;nohup iperf3 -i2 -s > 123.log&
 	ulog.Infof(rawd)
 
@@ -150,7 +150,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	ulog.Infof("iperf3 iperiperf3 -i2 ",p.DstIp,std1)
 
 	//(nohup iperf3 -i2 -c 192.168.0.115 -t20 > 1632989479555073807 2>&1 &) | timeout 10 tail -f 1632989479555073807
-	raw := fmt.Sprintf("(nohup iperf3 -i2 -c %s -t20 > %v 2>&1 &) | timeout 10 tail -f %v",p.DstIp,log,log)
+	raw := fmt.Sprintf("iperf3 -i2 -c %s -t20 > %v | timeout 10 tail -f %v",p.DstIp,log,log)
 	fmt.Println("rawrawrawrawrawrawrawrawraw",raw)
 	std2, err2 := login.U.SshHost(p.SrcIp,raw)
 	if err1 !=nil{
