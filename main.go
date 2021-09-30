@@ -136,7 +136,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 			fmt.Println("server error",err)
 			return
 		}
-		ulog.Infof("start server p.DstIp %s %s",p.DstIp,std1,err)
+		ulog.Infof("start server p.DstIp %s p.SrcIp******************\nserver Result%s\n***************  ",p.DstIp,p.SrcIp,std1)
 	}()
 
 	time.Sleep(time.Second*3)
@@ -148,7 +148,9 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 		fmt.Println("ssh error",err)
 		return err
 	}
-	ulog.Infof("Client Send========",p.SrcIp,std)
+	//ulog.Infof("Client Send========",p.SrcIp,std)
+	ulog.Infof("start Client p.SrcIp %s p.DstIp %s================\nclient Result%s\n==============  ",p.DstIp,p.SrcIp,std)
+
 
 	//
 	////;nohup iperf3 -i2 -s > 123.log&
