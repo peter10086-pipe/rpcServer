@@ -277,19 +277,18 @@ func (c *SSHClient) Run2(shell string) (string, error) {
 	if c.Client == nil {
 		if err := Retry(10, 2*time.Second, c.connect); err != nil {
 			t2 := time.Now()
-			log.Println("The connection failure took", t2.Sub(t1))
+			ulog.Infof("The connection failure took", t2.Sub(t1))
 			return "", err
 		}
 	}
 	t2 := time.Now()
-	log.Println("The successful connection took  %v", t2.Sub(t1))
+	ulog.Infof("The successful connection took  %v", t2.Sub(t1))
 	var err1 error
 	session, err1 := c.Client.NewSession()
 	if err1 != nil {
 		return "", err1
 	}
 	//globalClient[c.IP] = session
-	fmt.Println("globalClient",globalClient[c.IP])
 	//}
 	defer session.Close()
 	//mtx.Lock()
