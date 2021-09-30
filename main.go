@@ -142,24 +142,24 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	var sg sync.WaitGroup
 	var sk sync.WaitGroup
 	sg.Add(1)
-	go func(){
+	go func(pl Params){
 		defer sg.Done()
 		log := time.Now().UnixNano()
 		raw := fmt.Sprintf("(nohup timeout 30 iperf3 -i2 -s > %v &) | timeout 20 tail -f %v",log,log)
-		std1, err := login.U.SshHost(p.DstIp,raw)
+		std1, err := login.U.SshHost(pl.DstIp,raw)
 		if err !=nil{
 			return
 		}
 		fmt.Println(std1)
 		ulog.Infof(std1)
-	}()
+	}(p)
 	time.Sleep(time.Second*3)
 	sk.Add(1)
-	go func(){
+	go func(pl Params){
 		defer sk.Done()
 	//	log := time.Now().UnixNano()
 		raw := fmt.Sprintf("ping -h;")
-		std1, err := login.U.SshHost(p.SrcIp,raw)
+		std1, err := login.U.SshHost(pl.SrcIp,raw)
 		if err !=nil{
 			fmt.Println("errerrerrerrerrerrerr",err)
 
@@ -167,7 +167,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 		}
 		fmt.Println(std1)
 		ulog.Infof(std1)
-	}()
+	}(p)
 
 	sg.Wait()
 	sk.Wait()

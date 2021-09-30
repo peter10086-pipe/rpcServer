@@ -181,7 +181,7 @@ func (u *UCloudEnv) VerifyLoginSuccess(ips []string)error {
 
 func (u *UCloudEnv)  SshHost( host , rawCmd string) (stdout string, err error) {
 	Commcli := NewSSHClient(host, UhostUsername, Password)
-	defer Commcli.Client.Close()
+	//defer Commcli.Client.Close()
 	stdout, err = Commcli.Run2(rawCmd)
 	if err != nil {
 		return fmt.Sprintf("ExecNormal fail %s", rawCmd), err
