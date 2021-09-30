@@ -157,8 +157,8 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	sk.Add(1)
 	go func(){
 		defer sk.Done()
-		log := time.Now().UnixNano()
-		raw := fmt.Sprintf("ping -h ",p.DstIp,log,log)
+	//	log := time.Now().UnixNano()
+		raw := fmt.Sprintf("ping -h")
 		std1, err := login.U.SshHost(p.SrcIp,raw)
 		if err !=nil{
 			fmt.Println("errerrerrerrerrerrerr",err)
