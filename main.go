@@ -140,6 +140,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	ulog.Infof("start p.DstIp %s %s yum -y install iperf3",p.DstIp,std1)
 
 	var sg sync.WaitGroup
+	var sk sync.WaitGroup
 	sg.Add(1)
 	go func(){
 		defer sg.Done()
@@ -153,11 +154,11 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 		ulog.Infof(std1)
 	}()
 	time.Sleep(time.Second*3)
-	sg.Add(1)
+	sk.Add(1)
 	go func(){
-		defer sg.Done()
+		defer sk.Done()
 		log := time.Now().UnixNano()
-		raw := fmt.Sprintf("date; nohup iperf3 -i2 -c %s -t20 > %v & timeout 20 tail -f %v",p.DstIp,log,log)
+		raw := fmt.Sprintf("date; nohup iperf3 -i2 -c %s -t20 > %v 2 > &1 & timeout 20 tail -f %v",p.DstIp,log,log)
 		std1, err := login.U.SshHost(p.SrcIp,raw)
 		if err !=nil{
 			return
@@ -167,6 +168,9 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	}()
 
 	sg.Wait()
+	sk.Wait()
+	fmt.Println("endendendendendendendendendendendend")
+
 	return nil
 }
 
