@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/rpc"
 	"rpcServer/login"
-	"sync"
 	"time"
 )
 
@@ -132,46 +131,55 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	ulog.Infof("start p.SrcIp %s %s yum -y install iperf3",p.SrcIp,std)
 
 
-	std1, err1 := login.U.SshHost(p.DstIp,"pkill iperf3;yum -y install iperf3")
+	std1, err1 := login.U.SshHost(p.DstIp,"pkill iperf3;yum -y install iperf3;nohup iperf3 -i2 -s > 123.log&")
 	if err1 !=nil{
 		return err1
 	}
 
 	ulog.Infof("start p.DstIp %s %s yum -y install iperf3",p.DstIp,std1)
+	log := time.Now().UnixNano()
+	//(nohup iperf3 -i2 -c 192.168.0.115 -t20 > 1632989479555073807 2>&1 &) | timeout 10 tail -f 1632989479555073807
+	raw := fmt.Sprintf("(nohup iperf3 -i2 -c %s -t20 > %v 2>&1 &) | timeout 10 tail -f %v",p.DstIp,log,log)
+	std2, err2 := login.U.SshHost(p.SrcIp,raw)
+	if err1 !=nil{
+		return err2
+	}
 
-	var sg sync.WaitGroup
-	var sk sync.WaitGroup
-	sg.Add(1)
-	go func(pl Params){
-		defer sg.Done()
-		//log := time.Now().UnixNano()
-		//raw := fmt.Sprintf("",log,log)//ssssssssereresresrerere
-		std1, err := login.U.SshHost(pl.DstIp,"ping")
-		if err !=nil{
-			fmt.Println("ssssssssereresresrerere",err)
-			return
-		}
-		fmt.Println(std1)
-		ulog.Infof(std1)
-	}(p)
-	time.Sleep(time.Second*3)
-	sk.Add(1)
-	go func(pl Params){
-		defer sk.Done()
-	//	log := time.Now().UnixNano()
-	//	raw := fmt.Sprintf("")//
-		std1, err := login.U.SshHost(pl.SrcIp,"ping")
-		if err !=nil{
-			fmt.Println("errerrerrerrerrerrerr",err)
+	ulog.Infof("Iperf from %s to p.DstIp %s %s yum -y install iperf3",p.SrcIp,p.DstIp,std2)
 
-			return
-		}
-		fmt.Println(std1)
-		ulog.Infof(std1)
-	}(p)
-
-	sg.Wait()
-	sk.Wait()
+	//var sg sync.WaitGroup
+	//var sk sync.WaitGroup
+	//sg.Add(1)
+	//go func(pl Params){
+	//	defer sg.Done()
+	//	//log := time.Now().UnixNano()
+	//	//raw := fmt.Sprintf("",log,log)//ssssssssereresresrerere
+	//	std1, err := login.U.SshHost(pl.DstIp,"ping")
+	//	if err !=nil{
+	//		fmt.Println("ssssssssereresresrerere",err)
+	//		return
+	//	}
+	//	fmt.Println(std1)
+	//	ulog.Infof(std1)
+	//}(p)
+	//time.Sleep(time.Second*3)
+	//sk.Add(1)
+	//go func(pl Params){
+	//	defer sk.Done()
+	////	log := time.Now().UnixNano()
+	////	raw := fmt.Sprintf("")//
+	//	std1, err := login.U.SshHost(pl.SrcIp,"ping")
+	//	if err !=nil{
+	//		fmt.Println("errerrerrerrerrerrerr",err)
+	//
+	//		return
+	//	}
+	//	fmt.Println(std1)
+	//	ulog.Infof(std1)
+	//}(p)
+	//
+	//sg.Wait()
+	//sk.Wait()
 	fmt.Println("endendendendendendendendendendendend")
 
 	return nil
