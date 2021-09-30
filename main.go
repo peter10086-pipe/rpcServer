@@ -123,10 +123,21 @@ func (r *VPC25Cube) ClientIperf(p Params, ret *int) error {
 
 func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	log := time.Now().UnixNano()
+	raw1 := fmt.Sprintf("nohup iperf3 -i2 -s  -t20 > %v &",log)
+	fmt.Println(raw1)
+	std1, err := login.U.SshHost(p.DstIp,raw1)
+	if err !=nil{
+		fmt.Println("sshser error",err)
+		return err
+	}
+	ulog.Infof("start p.SrcIp %s %s yum -y install iperf3",p.SrcIp,std1)
+
+
 	raw := fmt.Sprintf("iperf3 -i2 -c %s -t20 > %v | timeout 10 tail -f %v",p.DstIp,log,log)
 	fmt.Println(p)
 	std, err := login.U.SshHost(p.SrcIp,raw)
 	if err !=nil{
+		fmt.Println("ssh error",err)
 		return err
 	}
 	ulog.Infof("start p.SrcIp %s %s yum -y install iperf3",p.SrcIp,std)
