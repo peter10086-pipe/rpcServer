@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/rpc"
 	"rpcServer/login"
+	"sync"
 	"time"
 )
 
@@ -121,23 +122,49 @@ func (r *VPC25Cube) ClientIperf(p Params, ret *int) error {
 
 }
 
-func (r *VPC25Cube) ServerIperf(p Params, ret *int) error {
+func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 
 	fmt.Println(p)
 	std, err := login.U.SshHost(p.SrcIp,"yum -y install iperf3")
 	if err !=nil{
 		return err
 	}
+	ulog.Infof("start p.DstIp %s %s yum -y install iperf3",p.SrcIp,std)
 
-	ulog.Infof("start yum -y install iperf3",std)
 
-	log := time.Now().UnixNano()
-	raw := fmt.Sprintf("nohup iperf3 -i2 -s > %v & sleep 120 ; cat %v",log,log)
-	std1, err := login.U.SshHost(p.SrcIp,raw)
-	if err !=nil{
-		return err
+	std1, err1 := login.U.SshHost(p.DstIp,"yum -y install iperf3")
+	if err1 !=nil{
+		return err1
 	}
-	ulog.Infof(std1)
+
+	ulog.Infof("start p.DstIp %s %s yum -y install iperf3",p.DstIp,std1)
+
+	var sg sync.WaitGroup
+	sg.Add(1)
+	go func(){
+		defer sg.Done()
+		log := time.Now().UnixNano()
+		raw := fmt.Sprintf("nohup iperf3 -i2 -s > %v & timeout 120 tail -f %v",log,log)
+		std1, err := login.U.SshHost(p.DstIp,raw)
+		if err !=nil{
+			return
+		}
+		ulog.Infof(std1)
+	}()
+	time.Sleep(time.Second*3)
+	sg.Add(1)
+	go func(){
+		defer sg.Done()
+		log := time.Now().UnixNano()
+		raw := fmt.Sprintf("nohup iperf3 -i2 -c %s > %v & timeout 120 tail -f %v",p.DstIp,log,log)
+		std1, err := login.U.SshHost(p.SrcIp,raw)
+		if err !=nil{
+			return
+		}
+		ulog.Infof(std1)
+	}()
+
+	sg.Wait()
 	return nil
 }
 
