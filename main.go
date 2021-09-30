@@ -136,7 +136,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 			fmt.Println("server error",err)
 			return
 		}
-		ulog.Infof("start server p.DstIp %s p.SrcIp******************\nserver Result%s\n***************  ",p.DstIp,p.SrcIp,std1)
+		ulog.Infof("start server p.DstIp %s p.SrcIp %s:\n******************\nserver Result%s\n******************  ",p.DstIp,p.SrcIp,std1)
 	}()
 
 	time.Sleep(time.Second*3)
@@ -149,7 +149,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 		return err
 	}
 	//ulog.Infof("Client Send========",p.SrcIp,std)
-	ulog.Infof("start Client p.SrcIp %s p.DstIp %s================\nclient Result%s\n==============  ",p.DstIp,p.SrcIp,std)
+	ulog.Infof("start Client p.SrcIp %s p.DstIp %s:\n================\nclient Result%s\n================  ",p.DstIp,p.SrcIp,std)
 
 
 	//
