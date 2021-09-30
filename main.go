@@ -149,6 +149,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 		if err !=nil{
 			return
 		}
+		fmt.Println(std1)
 		ulog.Infof(std1)
 	}()
 	time.Sleep(time.Second*3)
@@ -161,6 +162,7 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 		if err !=nil{
 			return
 		}
+		fmt.Println(std1)
 		ulog.Infof(std1)
 	}()
 
