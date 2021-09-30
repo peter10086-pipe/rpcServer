@@ -140,8 +140,10 @@ func (r *VPC25Cube) Iperf(p Params, ret *int) error {
 	log := time.Now().UnixNano()
 	//(nohup iperf3 -i2 -c 192.168.0.115 -t20 > 1632989479555073807 2>&1 &) | timeout 10 tail -f 1632989479555073807
 	raw := fmt.Sprintf("(nohup iperf3 -i2 -c %s -t20 > %v 2>&1 &) | timeout 10 tail -f %v",p.DstIp,log,log)
+	fmt.Println("rawrawrawrawrawrawrawrawraw",raw)
 	std2, err2 := login.U.SshHost(p.SrcIp,raw)
 	if err1 !=nil{
+		fmt.Println("dfdfdfsdffefefeffd",err2)
 		return err2
 	}
 
